@@ -137,19 +137,19 @@ termux_step_post_make_install() {
 
 	local failure=false
 	for binary in $binaries; do
-		grep -q "lib/jvm/java-26-openjdk/bin/${binary}$" "$TERMUX_PKG_BUILDER_DIR"/openjdk-25.alternatives || {
-			echo "ERROR: Missing entry for binary: $binary in openjdk-25.alternatives"
+		grep -q "lib/jvm/java-26-openjdk/bin/${binary}$" "$TERMUX_PKG_BUILDER_DIR"/openjdk-26.alternatives || {
+			echo "ERROR: Missing entry for binary: $binary in openjdk-26.alternatives"
 			failure=true
 		}
 	done
 
 	for manpage in $manpages; do
-		grep -q "lib/jvm/java-26-openjdk/man/man1/${manpage}$" "$TERMUX_PKG_BUILDER_DIR"/openjdk-25.alternatives || {
-			echo "ERROR: Missing entry for manpage: $manpage in openjdk-25.alternatives"
+		grep -q "lib/jvm/java-26-openjdk/man/man1/${manpage}$" "$TERMUX_PKG_BUILDER_DIR"/openjdk-26.alternatives || {
+			echo "ERROR: Missing entry for manpage: $manpage in openjdk-26.alternatives"
 			failure=true
 		}
 	done
 	if [[ "$failure" = true ]]; then
-		termux_error_exit "ERROR: openjdk-25.alternatives is not up to date, please update it."
+		termux_error_exit "ERROR: openjdk-26.alternatives is not up to date, please update it."
 	fi
 }
