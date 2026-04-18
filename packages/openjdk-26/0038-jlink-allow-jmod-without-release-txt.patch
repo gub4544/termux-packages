@@ -1,0 +1,31 @@
+Subject: [PATCH] jlink: allow target jmod without release.txt
+
+JDK 26 added a strict check in jlink that the target java.base.jmod
+must contain jdk/internal/misc/resources/release.txt and that its
+contents match the running jlink's release. This breaks AGP's
+JdkImageTransform, which builds a stripped jmod from Android's
+core-for-system-modules.jar that has no release.txt.
+
+Skip the check when the target jmod has no release.txt (treat as
+trusted), so AGP-generated jmods continue to work the same way they
+did under jdk25. The mismatch case (release.txt present but different)
+still errors as before.
+
+--- a/src/jdk.jlink/share/classes/jdk/tools/jlink/internal/JlinkTask.java
++++ b/src/jdk.jlink/share/classes/jdk/tools/jlink/internal/JlinkTask.java
+@@ -606,9 +606,12 @@
+     private static void checkJavaBaseVersion(ModuleReference target) {
+         String currentRelease = getCurrentRuntimeVersion();
+
+-        String targetRelease = getReleaseInfo(target).orElseThrow(() -> new IllegalArgumentException(
+-                taskHelper.getMessage("err.jlink.version.missing", currentRelease)));
+-
++        Optional<String> targetReleaseOpt = getReleaseInfo(target);
++        if (targetReleaseOpt.isEmpty()) {
++            // Termux: tolerate jmods without release.txt (e.g. AGP JdkImageTransform).
++            return;
++        }
++        String targetRelease = targetReleaseOpt.get();
+         if (!currentRelease.equals(targetRelease)) {
+             // Current runtime image and the target runtime image are not compatible build
+             throw new IllegalArgumentException(taskHelper.getMessage("err.jlink.version.mismatch",
