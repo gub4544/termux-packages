@@ -1,0 +1,15 @@
+From rebased@local Fri Apr 18 22:00:00 2026
+Subject: [PATCH] fpu_control gated for Android (linux_arm only; x86 path removed upstream)
+
+--- a/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp	2026-02-13 00:13:35.000000000 +0900
++++ b/src/hotspot/os_cpu/linux_arm/os_linux_arm.cpp	2026-04-18 21:13:25.512988024 +0900
+@@ -70,7 +70,9 @@
+ # include <pwd.h>
+ # include <poll.h>
+ # include <ucontext.h>
++#ifndef __ANDROID__
+ # include <fpu_control.h>
++#endif
+ # include <asm/ptrace.h>
+ 
+ #define SPELL_REG_SP  "sp"
