@@ -1,21 +1,21 @@
 Subject: [PATCH] forbiddenFunctions: bypass noexcept on Bionic libc
 
-JDK 26 added forbiddenFunctions.hpp which redeclares standard libc
-functions like strerror, malloc, wcsdup with explicit noexcept.
+JDK 26 added forbiddenFunctions.hpp/_posix.hpp which redeclare standard
+libc functions like strerror, malloc, wcsdup with explicit noexcept.
 Bionic (Android) declares these without noexcept, causing
 "exception specification in declaration does not match" errors.
 
 Introduce a BIONIC_NOEXCEPT macro that resolves to noexcept on
 non-Android targets and to nothing on Android, and apply it to all
-forbid declarations.
+forbid declarations. The macro is defined before the posix include
+so it is visible to the included file.
 
 --- a/src/hotspot/share/utilities/forbiddenFunctions.hpp
 +++ b/src/hotspot/share/utilities/forbiddenFunctions.hpp
-@@ -44,40 +44,49 @@
- #include "forbiddenFunctions_posix.hpp"
+@@ -38,6 +38,14 @@
+ #include <stdlib.h>
  #endif
  
-+
 +// Bionic libc does not declare standard C functions with noexcept,
 +// so on Android the noexcept on these forbids causes a redeclaration mismatch.
 +#if defined(__BIONIC__) || defined(__ANDROID__)
@@ -24,8 +24,10 @@ forbid declarations.
 +#define BIONIC_NOEXCEPT noexcept
 +#endif
 +
- // Forbid the use of various C library functions.  Some of these have os::
- // replacements that should be used instead.  Others are considered obsolete
+ #ifdef _WINDOWS
+ #include "forbiddenFunctions_windows.hpp"
+ #else
+@@ -49,35 +57,35 @@
  // or have security concerns, either with preferred alternatives, or to be
  // avoided entirely.
  
