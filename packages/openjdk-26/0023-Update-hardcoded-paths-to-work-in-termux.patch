@@ -579,9 +579,7 @@ index c9e3c8508..d07e36791 100644
 diff --git a/test/jdk/tools/jpackage/share/RuntimePackageTest.java b/test/jdk/tools/jpackage/share/RuntimePackageTe
 st.java
 index 2af6543c2..551e39e2a 100644
---- a/test/jdk/tools/jpackage/share/RuntimePackageTest.java
-+++ b/test/jdk/tools/jpackage/share/RuntimePackageTest.java
-@@ -86,8 +86,8 @@ public static void test() {
+@@ -90,8 +90,8 @@
      }
  
      @Test(ifOS = LINUX)
@@ -592,20 +590,20 @@ index 2af6543c2..551e39e2a 100644
      public static void testUsrInstallDir(String installDir) {
          init()
          .addInitializer(cmd -> cmd.addArguments("--install-dir", installDir))
-@@ -153,11 +153,11 @@ private static PackageTest init() {
-         .forTypes(PackageType.LINUX_DEB)
-         .addInstallVerifier(cmd -> {
-             String installDir = cmd.getArgumentValue("--install-dir", () -> "/opt");
--            Path copyright = Path.of("/usr/share/doc",
-+            Path copyright = Path.of("@TERMUX_PREFIX@/share/doc",
-                     LinuxHelper.getPackageName(cmd), "copyright");
-             boolean withCopyright = LinuxHelper.getPackageFiles(cmd).anyMatch(
-                     Predicate.isEqual(copyright));
--            if (installDir.startsWith("/usr/") || installDir.equals("/usr")) {
-+            if (installDir.startsWith("@TERMUX_PREFIX@/") || installDir.equals("@TERMUX_PREFIX@")) {
-                 assertTrue(withCopyright, String.format(
-                         "Check the package delivers [%s] copyright file",
-                         copyright));
+@@ -138,11 +138,11 @@
+         .forTypes(PackageType.LINUX_DEB, test -> {
+             test.addInstallVerifier(cmd -> {
+                 String installDir = cmd.getArgumentValue("--install-dir", () -> "/opt");
+-                Path copyright = Path.of("/usr/share/doc",
++                Path copyright = Path.of("@TERMUX_PREFIX@/share/doc",
+                         LinuxHelper.getPackageName(cmd), "copyright");
+                 boolean withCopyright = LinuxHelper.getPackageFiles(cmd).anyMatch(
+                         Predicate.isEqual(copyright));
+-                if (installDir.startsWith("/usr/") || installDir.equals("/usr")) {
++                if (installDir.startsWith("@TERMUX_PREFIX@/") || installDir.equals("@TERMUX_PREFIX@")) {
+                     assertTrue(withCopyright, String.format(
+                             "Check the package delivers [%s] copyright file",
+                             copyright));
 diff --git a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/resources/desktop_utils.sh b/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/resources/desktop_utils.sh
 index 7c243b2b5..a1a41b2b2 100644
 --- a/src/jdk.jpackage/linux/classes/jdk/jpackage/internal/resources/desktop_utils.sh
